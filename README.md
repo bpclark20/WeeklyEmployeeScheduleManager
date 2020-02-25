@@ -1,0 +1,2 @@
+# WeeklyEmployeeScheduleManager
+This web-based application uses PHP/MySQL to manage employees, employee availability, request offs, shifts, and weekly schedules. Normal employees can log in, post/update availabilities, request days off, update user info/password, and see work schedules for the current and upcoming weeks. Managers can see all employee availabilities, add/remove users, create schedules, add/update events that require staff, and remove previous schedules.
