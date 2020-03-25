@@ -4,33 +4,43 @@
 require 'pageWriter.php';
 
 $id = null;
-	if ( !empty($_GET['id'])) {
-		$id = $_REQUEST['id'];
-	}
-	
-	if ( null==$id ) {
-		header("Location: crud_persons.php");
-	}
-	
+if(!isset($_SESSION['employee_id'])){
+    session_destroy();
+    header('Location: login.php');
+    exit; // exit is here just in case the header redirect fails for some reason
+}
+else{
+	$id = $_SESSION['employee_id'];
 	if ( !empty($_POST)) {
 		// keep track validation errors
 		$fnameError = null;
 		$lnameError = null;
 		$emailError = null;
 		$mobileError = null;
-		#$passwordError = null; # Not Used Currently
-		#$titleError = null; # Not Used Currently
-		#$pictureError = null; # Not Used Currently
+		$titleError = null; 
+		$pictureError = null; 
 		
 		# Initialize POST Variables
 		$fname = $_POST['fname'];
 		$lname = $_POST['lname'];
 		$email = $_POST['email'];
 		$mobile = $_POST['mobile'];
-		#$password = $_POST['password']; # Not Used Currently
-		#$passwordhash = MD5($password); # Not Used Currently
 		$title =  $_POST['title'];
-		#$picture = $_POST['picture']; # Not Used Currently
+		//$picture = $_POST['picture'];
+
+		if (empty($_FILES)) {
+			$fileSize = 0;
+		}
+		else {
+			$fileName = $_FILES['picture']['name'];
+			$tmpName  = $_FILES['picture']['tmp_name'];
+			$fileSize = $_FILES['picture']['size'];
+			$fileType = $_FILES['picture']['type'];
+			$content = file_get_contents($tmpName);
+		}
+
+		# Initalize $_FILES variables
+		
 		
 		# Validate User Input
 		$valid = true;
@@ -65,11 +75,6 @@ $id = null;
 		$valid = false;
 		}
 
-		# Password validation not currently implemented.
-		#if (empty($password)) {
-		#	$passwordError = 'Please enter valid Password';
-		#	$valid = false;
-		#}
 		if (empty($title)) {
 			$titleError = 'Please enter valid Title';
 			$valid = false;
@@ -77,18 +82,29 @@ $id = null;
 		
 		// update data
 		if ($valid) {
-			$pdo = Database::connect();
-			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$sql = "UPDATE persons  set fname = ?, lname = ?, email = ?, mobile = ?, title = ? WHERE id = ?";
-			$q = $pdo->prepare($sql);
-			$q->execute(array($fname,$lname,$email,$mobile,$title,$id));
-			Database::disconnect();
-			header("Location: crud_customers.php");
+			if($fileSize > 0) {# if file size is greater than 0, the photo was updated
+				$pdo = Database::connect();
+				$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				$sql = "UPDATE employees  set fname = ?, lname = ?, email = ?, mobile = ?, title = ?, filename = ?,filesize = ?,filetype = ?,filecontent = ? WHERE id = ?";
+				$q = $pdo->prepare($sql);
+				$q->execute(array($fname,$lname,$email,$mobile,$title,$fileName,$fileSize,$fileType,$content,$id));
+				Database::disconnect();
+				header("Location: dashboard.php");
+			}
+			else { #otherwise update all the fields besides file fields
+				$pdo = Database::connect();
+				$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+				$sql = "UPDATE employees set fname = ?, lname = ?, email = ?, mobile = ?, title = ? WHERE id = ?";
+				$q = $pdo->prepare($sql);
+				$q->execute(array($fname,$lname,$email,$mobile,$title,$id));
+				Database::disconnect();
+				header("Location: dashboard.php");
+			}
 		}
 	} else {
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT * FROM persons where id = ?";
+		$sql = "SELECT * FROM employees where id = ?";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
@@ -97,19 +113,23 @@ $id = null;
 		$email = $data['email'];
 		$mobile = $data['mobile'];
 		$title = $data['title'];
+		$fileName = $data['filename'];
+		$fileSize = $data['filesize'];
+		$fileType = $data['filetype'];
+		$picture = $data['filecontent'];
 		Database::disconnect();
 	}
-
-writeHeader("CRUD - Persons - Update a person");
+}
+writeHeader("Update my Info");
 writeBodyOpen();
 ?>
 
 <div class="span10 offset1">
     				<div class="row">
-		    			<h2>Update a Person</h2>
+		    			<h2>Update my Info</h2>
 		    		</div>
     		
-	    			<form class="form-horizontal" action="crud_persons_update.php?id=<?php echo $id?>" method="post">
+	    			<form class="form-horizontal" action="employees_update.php" method="post" enctype="multipart/form-data">
 					  <div class="control-group <?php echo !empty($fnameError)?'error':'';?>">
 					    <label class="control-label">First Name</label>
 					    <div class="controls">
@@ -155,9 +175,24 @@ writeBodyOpen();
 					      	<?php endif;?>
 					    </div>
 					  </div>
+					  <div class="control-group <?php echo !empty($pictureError)?'error':'';?>">
+					    <label class="control-label">Photo</label>
+					    <div class="controls">
+							<?php
+							if($fileSize > 0) {
+								echo '<img src="data:image/jpeg;base64,' . base64_encode($picture) . '" width="200" height="200"/><br>';
+							}
+							?>
+							<label for="picture">Select a photo:</label>
+					      	<input name="picture" id="picture" type="file" required>
+					      	<?php if (!empty($pictureError)): ?>
+					      		<span class="help-inline"><?php echo $pictureError;?></span>
+					      	<?php endif;?>
+					    </div>
+					  </div>
 					  <div class="form-actions">
 						  <button type="submit" class="btn btn-success">Update</button>
-						  <a class="btn btn-warning" href="crud_persons.php">Back</a>
+						  <a class="btn btn-warning" href="dashboard.php">Back</a>
 						</div>
 					</form>
 				</div>

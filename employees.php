@@ -3,13 +3,13 @@
 #include helper php file
 require 'pageWriter.php';
 
-writeHeader("CRUD - Persons");
+writeHeader("List of Employees");
 writeBodyOpen();
 
-echo "<h2>CRUD - Persons</h2>";
+echo "<h2>Employees</h2>";
 echo "<div class='row'>
 				<p>
-					<a href='crud_persons_create.php' class='btn btn-success'>Add a New Person</a>
+					<a href='employees_create.php' class='btn btn-success'>Add a New Person</a>
 					<a href='../index.php' class='btn btn-primary'>Back to Index</a>
 				</p></div>";
 
@@ -17,10 +17,18 @@ writeTableOpen();
 
 echo "<thead>
         <tr>
-        <th>Name</th>
+        <th>First Name</th>
+        <th>Last Name</th>
         <th>E-mail Address</th>
         <th>Phone Number</th>
-        <th>Title</th>
+        <th>Job-Role</th>
+        <th>Sun. Availability</th>
+        <th>Mon. Availability</th>
+        <th>Tue. Availability</th>
+        <th>Wed. Availability</th>
+        <th>Thur. Availability</th>
+        <th>Fri. Availability</th>
+        <th>Sat. Availability</th>
         <th>Action</th></tr>
     </thead>";
 

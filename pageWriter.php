@@ -10,10 +10,15 @@ require '../db/database.php';
 // Ensures all pages maintain session state
 session_start();
 
-# Check if user is logged in, if not return false
-function checkLoggedIn($strSessionVar) {
-	if(!isset($_SESSION["person_id"])){ // if "user" not set,
-	return false;
+# Checks if a user is logged in, if so
+# true is returned, if not false is returned
+
+function checkLoggedIn() {
+  if(!isset($_SESSION['employee_id'])){
+    return true;
+  }
+  else{
+    return false;
   }
 }
 
