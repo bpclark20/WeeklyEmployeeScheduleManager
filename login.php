@@ -23,7 +23,6 @@ if ( !empty($_POST)) {
 	if($data) { // if successful login set session variables
 		$_SESSION['employee_id'] = $data['id'];
 		$sessionid = $data['id'];
-		$_SESSION['employee_title'] = $data['title'];
 		Database::disconnect();
 		header("Location: dashboard.php");
 		exit();

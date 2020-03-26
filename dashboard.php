@@ -13,7 +13,6 @@ if(!isset($_SESSION['employee_id'])){
 }
 else {
     $LoggedInID = $_SESSION['employee_id'];
-    $employeeTitle = $_SESSION['employee_title'];
     
     # Grab the extra details needed about this employee
 	$pdo = Database::connect();
@@ -26,7 +25,8 @@ else {
 
     $employeeFirstName = $data['fname'];
     $employeeLastName = $data['lname'];
-    $employeeEmail = $data['email'];
+		$employeeEmail = $data['email'];
+		$employeeTitle = $data['title'];
     Database::disconnect();
 }
 
@@ -64,18 +64,24 @@ writeBodyOpen();
 					    </div>
 					  </div>
 					    <div class="form-actions">
-						  <a class="btn btn-danger" href="logout.php">Logout</a>&nbsp;
-                          <a class="btn btn-primary" href="employees_update.php">Update Info</a>&nbsp;
-						  <?php 
-						  if($employeeTitle == 'Admin' or $employeeTitle == 'Manager') {
-							echo "<a class='btn btn-primary' href='employees_list.php'>View Employees</a>&nbsp;";
-							echo "<a class='btn btn-primary' href='events_list.php'>View Events</a>&nbsp;";
-							echo "<a class='btn btn-primary' href='assignments_list.php'>View Schedule</a>&nbsp;";
-						  }
-						  if($employeeTitle == 'Employee') {
-							echo "<a class='btn btn-primary' href='assignments_list.php'>My Scheduled Shifts</a>&nbsp;";
-							echo "<a class='btn btn-primary' href='availability_update.php'>My Availability</a>&nbsp;";
-						  } ?>
+							<a class="btn btn-success" href="https://github.com/diablodelnoche/cis355">View Github Code</a>
+							<a class="btn btn-danger" href="logout.php">Logout</a>&nbsp;
+              <a class="btn btn-primary" href="employees_update.php?id=<?php echo $LoggedInID . '"'; ?>>Update My Info</a>&nbsp;
+							<?php 
+								if(0==strcmp($employeeTitle,"Admin")) {
+									echo "<a class='btn btn-primary' href='employees_list.php'>View Employees</a>&nbsp;";
+									echo "<a class='btn btn-primary' href='events_list.php'>View Events</a>&nbsp;";
+									echo "<a class='btn btn-primary' href='assignments_list.php'>View Schedule</a>&nbsp;";
+								}
+								if(0==strcmp($employeeTitle,"Manager")) {
+									echo "<a class='btn btn-primary' href='employees_list.php'>View Employees</a>&nbsp;";
+									echo "<a class='btn btn-primary' href='events_list.php'>View Events</a>&nbsp;";
+									echo "<a class='btn btn-primary' href='assignments_list.php'>View Schedule</a>&nbsp;";
+								}
+						  		if(0==strcmp($employeeTitle,"Employee")) {
+									echo "<a class='btn btn-primary' href='assignments_list.php'>My Scheduled Shifts</a>&nbsp;";
+									echo "<a class='btn btn-primary' href='availability_update.php'>My Availability</a>&nbsp;";
+						  	} ?>
 					   </div>
 					
 					 

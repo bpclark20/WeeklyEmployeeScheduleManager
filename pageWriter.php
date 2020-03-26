@@ -91,3 +91,13 @@ function writeBodyOpen() {
     echo "<body>";
     echo "<div class='container'>";
 }
+
+function getLoggedInUserTitle($currentlyLoggedInUser) {
+  $pdo = Database::connect();
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$sql = "SELECT * FROM employees where id = ? LIMIT 1";
+	$q = $pdo->prepare($sql);
+	$q->execute(array($currentlyLoggedInUser));
+  $data = $q->fetch(PDO::FETCH_ASSOC);
+  return $data['title'];
+}

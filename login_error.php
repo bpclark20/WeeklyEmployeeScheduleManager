@@ -9,13 +9,17 @@
 # include helper php file
 require 'pageWriter.php';
 
-writeHeader();
+writeHeader("Login Error");
 writeBodyOpen();
 ?>
 <div class="row">
 	<h2>Login Error</h2>
 </div>
 		
+<div class="row">
+	<p>You either entered an incorrect e-mail, or password. Please try logging in again.</p>
+</div>
+
 <div class="row">
 	<p><a href="login.php" class="btn btn-success">Return to Login</a></p>
 </div>

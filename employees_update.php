@@ -4,13 +4,23 @@
 require 'pageWriter.php';
 
 $id = null;
+
 if(!isset($_SESSION['employee_id'])){
     session_destroy();
     header('Location: login.php');
     exit; // exit is here just in case the header redirect fails for some reason
 }
 else{
-	$id = $_SESSION['employee_id'];
+	if ( !empty($_GET['id'])) {
+		$id = $_REQUEST['id'];
+	}
+
+	if (null==$id) {
+		header('Location: dashboard.php');
+	}
+
+	$LoggedInID = $_SESSION['employee_id'];
+	
 	if ( !empty($_POST)) {
 		// keep track validation errors
 		$fnameError = null;
@@ -85,11 +95,16 @@ else{
 			if($fileSize > 0) {# if file size is greater than 0, the photo was updated
 				$pdo = Database::connect();
 				$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				$sql = "UPDATE employees  set fname = ?, lname = ?, email = ?, mobile = ?, title = ?, filename = ?,filesize = ?,filetype = ?,filecontent = ? WHERE id = ?";
+				$sql = "UPDATE employees set fname = ?, lname = ?, email = ?, mobile = ?, title = ?, filename = ?,filesize = ?,filetype = ?,filecontent = ? WHERE id = ?";
 				$q = $pdo->prepare($sql);
 				$q->execute(array($fname,$lname,$email,$mobile,$title,$fileName,$fileSize,$fileType,$content,$id));
 				Database::disconnect();
-				header("Location: dashboard.php");
+				if (0==strcmp($id,$LoggedInID)) {
+					header("Location: dashboard.php");
+				}
+				else {
+					header("Location: employees_list.php");
+				}
 			}
 			else { #otherwise update all the fields besides file fields
 				$pdo = Database::connect();
@@ -98,16 +113,24 @@ else{
 				$q = $pdo->prepare($sql);
 				$q->execute(array($fname,$lname,$email,$mobile,$title,$id));
 				Database::disconnect();
-				header("Location: dashboard.php");
+				if (0==strcmp($id,$LoggedInID)) {
+					header("Location: dashboard.php");
+				}
+				else {
+					header("Location: employees_list.php");
+				}
+				
 			}
 		}
 	} else {
+		# Grab the info the employee we are currently trying to update
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT * FROM employees where id = ?";
+		$sql = "SELECT * FROM employees where id = ? LIMIT 1";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
+		$id = $data['id'];
 		$fname = $data['fname'];
 		$lname = $data['lname'];
 		$email = $data['email'];
@@ -118,22 +141,35 @@ else{
 		$fileType = $data['filetype'];
 		$picture = $data['filecontent'];
 		Database::disconnect();
+
+		# Grab the credentials of the user who is currently trying to 
+		# make the update
+		$pdo = Database::connect();
+		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+		$sql = "SELECT * FROM employees where id = ? LIMIT 1";
+		$q = $pdo->prepare($sql);
+		$q->execute(array($LoggedInID));
+		$data = $q->fetch(PDO::FETCH_ASSOC);
+
+		$LoggedInEmployeeTitle = $data['title'];
+
+		Database::disconnect();
 	}
 }
-writeHeader("Update my Info");
+writeHeader("Update Employee Info");
 writeBodyOpen();
 ?>
 
 <div class="span10 offset1">
     				<div class="row">
-		    			<h2>Update my Info</h2>
+		    			<h2>Update Employee Info</h2>
 		    		</div>
     		
 	    			<form class="form-horizontal" action="employees_update.php" method="post" enctype="multipart/form-data">
 					  <div class="control-group <?php echo !empty($fnameError)?'error':'';?>">
 					    <label class="control-label">First Name</label>
 					    <div class="controls">
-					      	<input name="fname" type="text"  placeholder="First Name" value="<?php echo !empty($fname)?$fname:'';?>">
+					      	<input name="fname" type="text"  placeholder="First Name" value="<?php echo !empty($fname)?$fname:' ';?>">
 					      	<?php if (!empty($fnameError)): ?>
 					      		<span class="help-inline"><?php echo $fnameError;?></span>
 					      	<?php endif; ?>
@@ -169,7 +205,9 @@ writeBodyOpen();
 					  <div class="control-group <?php echo !empty($titleError)?'error':'';?>">
 					    <label class="control-label">Title</label>
 					    <div class="controls">
-					      	<input name="title" type="text"  placeholder="Title" value="<?php echo !empty($title)?$title:'';?>">
+					      	<input name="title" type="text"  placeholder="Title" value="<?php echo !empty($title)?$title:'';?>"
+											<?php if (0!=strcmp($LoggedInEmployeeTitle,"Admin")) {
+												echo 'readonly';} ?>>
 					      	<?php if (!empty($titleError)): ?>
 					      		<span class="help-inline"><?php echo $titleError;?></span>
 					      	<?php endif;?>
