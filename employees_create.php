@@ -110,9 +110,9 @@ if ( !empty($_POST)) {
 		if ($valid) {
 			$pdo = Database::connect();
 			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-			$sql = "INSERT INTO employees fname = ?, lname = ?, email = ?, mobile = ?, password=?, title = ?, filename = ?,filesize = ?,filetype = ?,filecontent = ?";
+			$sql = "INSERT INTO employees (fname,lname,email,mobile,password,title,filename,filesize,filetype,filecontent) values(?,?,?,?,?,?,?,?,?,?)";
 			$q = $pdo->prepare($sql);
-			$q->execute(array($fname, $lname, $email,$mobile,$passwordhash, $title, $fileName, $fileSize, $fileType, $content));
+			$q->execute(array($fname,$lname,$email,$mobile,$passwordhash,$title,$fileName,$fileSize,$fileType,$content));
 			Database::disconnect();
 			header("Location: employees_list.php");
 		}

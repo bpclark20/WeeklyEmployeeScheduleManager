@@ -27,6 +27,7 @@ else{
 		$lnameError = null;
 		$emailError = null;
 		$mobileError = null;
+		$passwordError = null;
 		$titleError = null; 
 		$pictureError = null; 
 		
@@ -35,6 +36,8 @@ else{
 		$lname = $_POST['lname'];
 		$email = $_POST['email'];
 		$mobile = $_POST['mobile'];
+		$password = $_POST['password']; 
+		$passwordhash = MD5($password); 
 		$title =  $_POST['title'];
 		//$picture = $_POST['picture'];
 
@@ -72,6 +75,12 @@ else{
 			$emailError = 'Please enter a valid Email Address';
 			$valid = false;
 		}
+
+		// email must contain only lower case letters
+		if (strcmp(strtolower($email),$email)!=0) {
+			$emailError = 'email address can contain only lower case letters';
+			$valid = false;
+		}
 		
 		if (empty($mobile)) {
 			$mobileError = 'Please enter a mobile number.';
@@ -85,6 +94,11 @@ else{
 		$valid = false;
 		}
 
+		if (empty($password)) {
+			$passwordError = 'Please enter valid Password';
+			$valid = false;
+		}
+
 		if (empty($title)) {
 			$titleError = 'Please enter valid Title';
 			$valid = false;
@@ -95,9 +109,9 @@ else{
 			if($fileSize > 0) {# if file size is greater than 0, the photo was updated
 				$pdo = Database::connect();
 				$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				$sql = "UPDATE employees set fname = ?, lname = ?, email = ?, mobile = ?, title = ?, filename = ?,filesize = ?,filetype = ?,filecontent = ? WHERE id = ?";
+				$sql = "UPDATE employees set fname = ?, lname = ?, email = ?, mobile = ?, password = ?, title = ?, filename = ?, filesize = ?, filetype = ?, filecontent = ? WHERE id = ?";
 				$q = $pdo->prepare($sql);
-				$q->execute(array($fname,$lname,$email,$mobile,$title,$fileName,$fileSize,$fileType,$content,$id));
+				$q->execute(array($fname, $lname, $email, $mobile, $passwordhash, $title, $fileName, $fileSize, $fileType, $content, $id));
 				Database::disconnect();
 				if (0==strcmp($id,$LoggedInID)) {
 					header("Location: dashboard.php");
@@ -109,9 +123,9 @@ else{
 			else { #otherwise update all the fields besides file fields
 				$pdo = Database::connect();
 				$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				$sql = "UPDATE employees set fname = ?, lname = ?, email = ?, mobile = ?, title = ? WHERE id = ?";
+				$sql = "UPDATE employees set fname = ?, lname = ?, email = ?, mobile = ?, password = ?, title = ? WHERE id = ?";
 				$q = $pdo->prepare($sql);
-				$q->execute(array($fname,$lname,$email,$mobile,$title,$id));
+				$q->execute(array($fname, $lname, $email, $mobile, $passwordhash, $title, $id));
 				Database::disconnect();
 				if (0==strcmp($id,$LoggedInID)) {
 					header("Location: dashboard.php");
@@ -119,7 +133,6 @@ else{
 				else {
 					header("Location: employees_list.php");
 				}
-				
 			}
 		}
 	} else {
@@ -144,16 +157,7 @@ else{
 
 		# Grab the credentials of the user who is currently trying to 
 		# make the update
-		$pdo = Database::connect();
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT * FROM employees where id = ? LIMIT 1";
-		$q = $pdo->prepare($sql);
-		$q->execute(array($LoggedInID));
-		$data = $q->fetch(PDO::FETCH_ASSOC);
-
-		$LoggedInEmployeeTitle = $data['title'];
-
-		Database::disconnect();
+		$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInID);
 	}
 }
 writeHeader("Update Employee Info");
@@ -165,11 +169,11 @@ writeBodyOpen();
 		    			<h2>Update Employee Info</h2>
 		    		</div>
     		
-	    			<form class="form-horizontal" action="employees_update.php" method="post" enctype="multipart/form-data">
+	    			<form class="form-horizontal" action="employees_update.php?id=<?php echo $id?>" method="post" enctype="multipart/form-data">
 					  <div class="control-group <?php echo !empty($fnameError)?'error':'';?>">
 					    <label class="control-label">First Name</label>
 					    <div class="controls">
-					      	<input name="fname" type="text"  placeholder="First Name" value="<?php echo !empty($fname)?$fname:' ';?>">
+					      	<input name="fname" type="text"  placeholder="First Name" value="<?php echo !empty($fname)?$fname:' ';?>" required>
 					      	<?php if (!empty($fnameError)): ?>
 					      		<span class="help-inline"><?php echo $fnameError;?></span>
 					      	<?php endif; ?>
@@ -178,7 +182,7 @@ writeBodyOpen();
 					  <div class="control-group <?php echo !empty($lnameError)?'error':'';?>">
 					    <label class="control-label">Last Name</label>
 					    <div class="controls">
-					      	<input name="lname" type="text"  placeholder="Last Name" value="<?php echo !empty($lname)?$lname:'';?>">
+					      	<input name="lname" type="text"  placeholder="Last Name" value="<?php echo !empty($lname)?$lname:'';?>" required>
 					      	<?php if (!empty($lnameError)): ?>
 					      		<span class="help-inline"><?php echo $lnameError;?></span>
 					      	<?php endif; ?>
@@ -187,9 +191,18 @@ writeBodyOpen();
 					  <div class="control-group <?php echo !empty($emailError)?'error':'';?>">
 					    <label class="control-label">Email Address</label>
 					    <div class="controls">
-					      	<input name="email" type="text" placeholder="Email Address" value="<?php echo !empty($email)?$email:'';?>">
+					      	<input name="email" type="text" placeholder="Email Address" value="<?php echo !empty($email)?$email:'';?>" required>
 					      	<?php if (!empty($emailError)): ?>
 					      		<span class="help-inline"><?php echo $emailError;?></span>
+					      	<?php endif;?>
+					    </div>
+					  </div>
+						<div class="control-group <?php echo !empty($passwordError)?'error':'';?>">
+					    <label class="control-label">Password</label>
+					    <div class="controls">
+					      	<input name="password" type="password" placeholder="Password" required>
+					      	<?php if (!empty($passwordError)): ?>
+					      		<span class="help-inline"><?php echo $passwordError;?></span>
 					      	<?php endif;?>
 					    </div>
 					  </div>
@@ -207,7 +220,7 @@ writeBodyOpen();
 					    <div class="controls">
 					      	<input name="title" type="text"  placeholder="Title" value="<?php echo !empty($title)?$title:'';?>"
 											<?php if (0!=strcmp($LoggedInEmployeeTitle,"Admin")) {
-												echo 'readonly';} ?>>
+												echo 'readonly';} ?> required>
 					      	<?php if (!empty($titleError)): ?>
 					      		<span class="help-inline"><?php echo $titleError;?></span>
 					      	<?php endif;?>

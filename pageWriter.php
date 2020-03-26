@@ -15,10 +15,9 @@ session_start();
 
 function checkLoggedIn() {
   if(!isset($_SESSION['employee_id'])){
-    return true;
-  }
-  else{
-    return false;
+    session_destroy();
+    header('Location: login.php');
+    exit; // exit is here just in case the header redirect fails for some reason
   }
 }
 

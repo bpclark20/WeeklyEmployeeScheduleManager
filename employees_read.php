@@ -3,47 +3,62 @@
 #include helper php file
 require 'pageWriter.php';
 
-$id = null;
+if(!isset($_SESSION['employee_id'])){
+	session_destroy();
+	header('Location: login.php');
+	exit; // exit is here just in case the header redirect fails for some reason
+}
+else {
+	$LoggedInEmployeeID = $_SESSION['employee_id'];
+
+	$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInEmployeeID);
+	# if the user currently logged in is not a Manager
+	# or an administrator, then redirect them back to the dashboard
+	if (0==strcmp($LoggedInEmployeeTitle,'Employee')) {
+		header('Location: dashboard.php');
+	}
+
+	$id = null;
 	if ( !empty($_GET['id'])) {
 		$id = $_REQUEST['id'];
 	}
 	
 	if ( null==$id ) {
-		header("Location: crud_persons.php");
+		header("Location: employees_list.php");
 	} else {
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT * FROM persons where id = ?";
+		$sql = "SELECT * FROM employees where id = ?";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($id));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
 		Database::disconnect();
 	}
+}
 
-writeHeader("CRUD - Persons - Read a person");
+
+
+writeHeader("View Employee Details");
 writeBodyOpen();
-
-echo "<h2>CRUD - Persons</h2>";
-
 ?>
 
+<h2>View Employee Info</h2>
+
 <div class="span10 offset1">
-    				<div class="row">
-		    			<h3>Person Details</h3>
-		    		</div>
+
 		    		
-	    			<div class="form-horizontal" >
-					  <div class="control-group">
-					    <h4>Name</h4>
-					    <div class="controls">
-						    <label class="checkbox">
+	<div class="form-horizontal" >
+		<div class="control-group">
+			<h3>Name</h3>
+			<div class="controls">
+				<label class="checkbox">
 						     	<?php echo $data['fname'] . " ";
 						     	echo $data['lname'];?>
 						    </label>
 					    </div>
 					  </div>
 					  <div class="control-group">
-					    <h4>Email Address</h4>
+					    <h3>Email Address</h3>
 					    <div class="controls">
 					      	<label class="checkbox">
 						     	<?php echo $data['email'];?>
@@ -51,7 +66,7 @@ echo "<h2>CRUD - Persons</h2>";
 					    </div>
 					  </div>
 					  <div class="control-group">
-					    <h4>Phone Number</h4>
+					    <h3>Phone Number</h3>
 					    <div class="controls">
 					      	<label class="checkbox">
 						     	<?php echo $data['mobile'];?>
@@ -59,25 +74,30 @@ echo "<h2>CRUD - Persons</h2>";
 					    </div>
 					  </div>
 					  <div class="control-group">
-					    <h4>Title</h4>
+					    <h3>Job-Role</h3>
 					    <div class="controls">
 					      	<label class="checkbox">
 						     	<?php echo $data['title'];?>
 						    </label>
 					    </div>
 					  </div>
-					  <!-- photo upload not currently implemented
-					  <div class="control-group">
-					    <h4>Photo</h4>
+						<div class="control-group">
+					    <h3>Photo</h3>
 					    <div class="controls">
 					      	<label class="checkbox">
-						     	<?php echo $data['filecontent'];?>
+						     	<?php if($data['filesize'] > 0) {
+								echo '<img src="data:image/jpeg;base64,' . base64_encode($data['filecontent']) . '" width="200" height="200"/><br>';
+							}?>
 						    </label>
 					    </div>
 					  </div>
-					-->
 					    <div class="form-actions">
-						  <a class="btn btn-primary" href="crud_persons.php">Back</a>
+							<?php
+							if ((0==strcmp($LoggedInEmployeeTitle,'Manager') and 0==strcmp($LoggedInEmployeeID,$data['id'])) or (0==strcmp($LoggedInEmployeeTitle,'Admin'))){
+								echo '<a class="btn btn-success" href="employees_update.php?id='.$data['id'].'">Update</a>';
+							}
+							?>
+							<a class="btn btn-primary" href="employees_list.php">Back</a>
 					   </div>
 					
 					 

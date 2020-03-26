@@ -21,12 +21,11 @@ if ( !empty($_POST)) { // if not first time through
 	$password = $_POST['password'];
 	$passwordhash = MD5($password);
 	$title =  $_POST['title'];
-	$picture = $_POST['picture']; // not used
 	
 	// initialize $_FILES variables
 	$fileName = $_FILES['userfile']['name'];
 	$tmpName  = $_FILES['userfile']['tmp_name'];
-	$fileSize = $_FILES['userfile']['size'];
+	$filesize = $_FILES['userfile']['size'];
 	$fileType = $_FILES['userfile']['type'];
 	$content = file_get_contents($tmpName);
 
@@ -103,23 +102,22 @@ if ( !empty($_POST)) { // if not first time through
 		$pdo = Database::connect();
 		
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "INSERT INTO persons (fname,lname,email,mobile,password,title,
+		$sql = "INSERT INTO employees (fname,lname,email,mobile,password,title,
 		filename,filesize,filetype,filecontent) values(?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($fname,$lname,$email,$mobile,$passwordhash,$title,
-		$fileName,$fileSize,$fileType,$content));
+		$fileName,$filesize,$fileType,$content));
 		
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT * FROM persons WHERE email = ? AND password = ? LIMIT 1";
+		$sql = "SELECT * FROM employees WHERE email = ? AND password = ? LIMIT 1";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($email,$passwordhash));
 		$data = $q->fetch(PDO::FETCH_ASSOC);
 		
-		$_SESSION['person_id'] = $data['id'];
-		$_SESSION['person_title'] = $data['title'];
+		$_SESSION['employee_id'] = $data['id'];
 		
 		Database::disconnect();
-		header("Location: login.php");
+		header("Location: dashboard.php");
 	}
 }
 writeHeader("Register new Employee - Apple Mountain");
@@ -127,7 +125,7 @@ writeBodyOpen();
 ?>
 
 <div class="row">
-				<h3>Add New Volunteer</h3>
+				<h3>Register new Employee</h3>
 			</div>
 	
 			<form class="form-horizontal" action="register.php" method="post" enctype="multipart/form-data">

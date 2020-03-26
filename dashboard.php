@@ -6,30 +6,23 @@ require 'pageWriter.php';
 # If employee_id is not set, the user
 # is not logged in, so redirect them
 # to the login page.
-if(!isset($_SESSION['employee_id'])){
-    session_destroy();
-    header('Location: login.php');
-    exit; // exit is here just in case the header redirect fails for some reason
-}
-else {
-    $LoggedInID = $_SESSION['employee_id'];
-    
-    # Grab the extra details needed about this employee
-	$pdo = Database::connect();
-	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$sql = "SELECT * FROM employees WHERE id = ?";
-	$q = $pdo->prepare($sql);
-	$q->execute(array($LoggedInID));
-    $data = $q->fetch(PDO::FETCH_ASSOC);
-    
+checkLoggedIn();
+$LoggedInID = $_SESSION['employee_id'];
+	
+	# Grab the extra details needed about this employee
+$pdo = Database::connect();
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$sql = "SELECT * FROM employees WHERE id = ?";
+$q = $pdo->prepare($sql);
+$q->execute(array($LoggedInID));
+	$data = $q->fetch(PDO::FETCH_ASSOC);
+	
 
-    $employeeFirstName = $data['fname'];
-    $employeeLastName = $data['lname'];
-		$employeeEmail = $data['email'];
-		$employeeTitle = $data['title'];
-    Database::disconnect();
-}
-
+$employeeFirstName = $data['fname'];
+$employeeLastName = $data['lname'];
+$employeeEmail = $data['email'];
+$employeeTitle = $data['title'];
+Database::disconnect();
 
 writeHeader("Employee Dashboard");
 writeBodyOpen();
