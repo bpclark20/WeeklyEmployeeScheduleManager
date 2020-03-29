@@ -14,11 +14,11 @@ $q = $pdo->prepare($sql);
 $q->execute(array($id));
 $data = $q->fetch(PDO::FETCH_ASSOC);
 
-# get volunteer details
-$sql = "SELECT * FROM persons where id = ?";
+# get employee details
+$sql = "SELECT * FROM employees where id = ?";
 $q = $pdo->prepare($sql);
 $q->execute(array($data['assign_per_id']));
-$perdata = $q->fetch(PDO::FETCH_ASSOC);
+$empdata = $q->fetch(PDO::FETCH_ASSOC);
 
 # get event details
 $sql = "SELECT * FROM events where id = ?";
@@ -28,7 +28,7 @@ $eventdata = $q->fetch(PDO::FETCH_ASSOC);
 
 Database::disconnect();
 
-writeHeader("CRUD - Assignments - Read an assignment");
+writeHeader("Read a shift assignment");
 writeBodyOpen();?>
 
 
@@ -39,10 +39,10 @@ writeBodyOpen();?>
 			
 	<div class="form-horizontal" >
 		<div class="control-group">
-			<h3>Volunteer</h3>
+			<h3>Employee</h3>
 			<div class="controls">
 				<label class="checkbox">
-					<?php echo $perdata['lname'] . ', ' . $perdata['fname'] ;?>
+					<?php echo $empdata['lname'] . ', ' . $empdata['fname'] ;?>
 				</label>
 			</div>
 		</div>
@@ -64,9 +64,25 @@ writeBodyOpen();?>
 				</label>
 			</div>
 		</div>
+
+		<div class="control-group">
+			<h3>Uniform</h3>
+			<div class="controls">
+				<label class="checkbox">
+					<?php echo trim($eventdata['uniform']);?>
+				</label>
+			</div>
+		</div>
 				
 		<div class="form-actions">
-			<a class="btn btn-primary" href="crud_assignments.php">Back</a>
+		<?php
+		if(0==strcmp($empdata['title'],'Employee')) {
+			echo '<a class="btn btn-primary" href="assignments_list.php?id=' . $empdata['id']. '">Back</a>';
+		}
+		else {
+			echo '<a class="btn btn-primary" href="assignments_list.php">Back</a>';
+		}
+		?>
 		</div>
 			
 	</div> <!-- end div: class="form-horizontal" -->

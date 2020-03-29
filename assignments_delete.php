@@ -20,7 +20,7 @@ if ( !empty($_POST)) { // if user clicks "yes" (sure to delete), delete record
 	$q = $pdo->prepare($sql);
 	$q->execute(array($id));
 	Database::disconnect();
-	header("Location: crud_assignments.php");
+	header("Location: assignments_list.php");
 }
 else { // otherwise, pre-populate fields to show data to be deleted
 
@@ -33,11 +33,11 @@ else { // otherwise, pre-populate fields to show data to be deleted
 	$q->execute(array($id));
 	$data = $q->fetch(PDO::FETCH_ASSOC);
 	
-	# get volunteer details
-	$sql = "SELECT * FROM persons where id = ?";
+	# get employee details
+	$sql = "SELECT * FROM employees where id = ?";
 	$q = $pdo->prepare($sql);
 	$q->execute(array($data['assign_per_id']));
-	$perdata = $q->fetch(PDO::FETCH_ASSOC);
+	$empdata = $q->fetch(PDO::FETCH_ASSOC);
 	
 	# get event details
 	$sql = "SELECT * FROM events where id = ?";
@@ -48,24 +48,24 @@ else { // otherwise, pre-populate fields to show data to be deleted
 	Database::disconnect();
 }
 
-writeHeader("CRUD - Assignments - Delete an Assignment");
+writeHeader("Remove Employee From Event");
 writeBodyOpen();?>
 
 <div class="span10 offset1">
 		
 			<div class="row">
-				<h2>Delete Assignment</h2>
+				<h2>Remove Employee from Event</h2>
 			</div>
 			
-			<!-- Display same information as in file: crud_assignments_read.php -->
+			<!-- Display same information as in file: assignments_read.php -->
 			
 			<div class="form-horizontal">
 			
 				<div class="control-group">
-					<h3>Volunteer</h3>
+					<h3>Employee</h3>
 					<div class="controls">
 						<label class="checkbox">
-							<?php echo $perdata['lname'] . ', ' . $perdata['fname'] ;?>
+							<?php echo $empdata['lname'] . ', ' . $empdata['fname'] ;?>
 						</label>
 					</div>
 				</div>
@@ -90,12 +90,12 @@ writeBodyOpen();?>
 			
 			</div> <!-- end div: class="form-horizontal" -->
 
-			<form class="form-horizontal" action="crud_assignments_delete.php" method="post">
+			<form class="form-horizontal" action="assignments_delete.php" method="post">
 				<input type="hidden" name="id" value="<?php echo $id;?>"/>
-				<p class="alert alert-error">Are you sure you want to delete?</p>
+				<p class="alert alert-error">Are you sure you want to remove this employee from the event?</p>
 				<div class="form-actions">
 					<button type="submit" class="btn btn-danger">Yes</button>
-					<a class="btn btn-warning" href="crud_assignments.php">No</a>
+					<a class="btn btn-warning" href="assignments_list.php">No</a>
 				</div>
 			</form>
 			

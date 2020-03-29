@@ -218,12 +218,27 @@ writeBodyOpen();
 					  <div class="control-group <?php echo !empty($titleError)?'error':'';?>">
 					    <label class="control-label">Title</label>
 					    <div class="controls">
-					      	<input name="title" type="text"  placeholder="Title" value="<?php echo !empty($title)?$title:'';?>"
-											<?php if (0!=strcmp($LoggedInEmployeeTitle,"Admin")) {
-												echo 'readonly';} ?> required>
-					      	<?php if (!empty($titleError)): ?>
-					      		<span class="help-inline"><?php echo $titleError;?></span>
-					      	<?php endif;?>
+							<select class='form-control' name='title' id='title'>
+							<?php 
+							if(0==strcmp($title, 'Admin')) {
+								echo "<option value='Employee'>Employee</option>";
+								echo "<option value='Manager'>Manager</option>";
+								echo "<option value='Admin' selected>Admin</option>";
+							}
+							elseif(0==strcmp($title, 'Manager')) {
+								echo "<option value='Employee'>Employee</option>";
+								echo "<option value='Manager' selected>Manager</option>";
+								echo "<option value='Admin'>Admin</option>";
+							}
+							else{
+								echo "<option value='Employee' selected>Employee</option>";
+								echo "<option value='Manager'>Manager</option>";
+								echo "<option value='Admin'>Admin</option>";
+							}
+							if (!empty($titleError)): ?>
+								<span class="help-inline"><?php echo $titleError;?></span>
+							<?php endif;?>
+							</select>
 					    </div>
 					  </div>
 					  <div class="control-group <?php echo !empty($pictureError)?'error':'';?>">

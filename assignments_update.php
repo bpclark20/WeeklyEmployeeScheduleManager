@@ -14,13 +14,13 @@ if ( !empty($_POST)) { // if $_POST filled then process the form
 	$eventError = null;
 	
 	// initialize $_POST variables
-	$person = $_POST['person_id'];    // same as HTML name=attribute in put box
+	$employee = $_POST['employee_id'];    // same as HTML name=attribute in put box
 	$event = $_POST['event_id'];
 	
 	// validate user input
 	$valid = true;
-	if (empty($person)) {
-		$personError = 'Please choose a volunteer';
+	if (empty($employee)) {
+		$employeeError = 'Please choose an employee';
 		$valid = false;
 	}
 	if (empty($event)) {
@@ -33,9 +33,9 @@ if ( !empty($_POST)) { // if $_POST filled then process the form
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 		$sql = "UPDATE assignments set assign_per_id = ?, assign_event_id = ? WHERE id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($person,$event,$id));
+		$q->execute(array($employee,$event,$id));
 		Database::disconnect();
-		header("Location: crud_assignments.php");
+		header("Location: assignments_list.php");
 	}
 }
 else { // if $_POST NOT filled then pre-populate the form
@@ -45,12 +45,12 @@ else { // if $_POST NOT filled then pre-populate the form
 	$q = $pdo->prepare($sql);
 	$q->execute(array($id));
 	$data = $q->fetch(PDO::FETCH_ASSOC);
-	$person = $data['assign_per_id'];
+	$employee = $data['assign_per_id'];
 	$event = $data['assign_event_id'];
 	Database::disconnect();
 }
 
-writeHeader("CRUD - Assignments - Update an assignment");
+writeHeader("Update a job assignment.");
 writeBodyOpen();?>
 
 <div class="span10 offset1">
@@ -58,20 +58,22 @@ writeBodyOpen();?>
 		<h2>Update an Assignment</h2>
 	</div>
 	
-	<form class="form-horizontal" action="crud_assignments_update.php?id=<?php echo $id?>" method="post">	
+	<form class="form-horizontal" action="assignments_update.php?id=<?php echo $id?>" method="post">	
 		<div class="control-group">
-			<label class="control-label">Volunteer</label>
+			<label class="control-label">Employee</label>
 			<div class="controls">
 				<?php
 					$pdo = Database::connect();
-					$sql = 'SELECT * FROM persons ORDER BY lname ASC, fname ASC';
-					echo "<select class='form-control' name='person_id' id='person_id'>";
+					$sql = 'SELECT * FROM employees ORDER BY lname ASC, fname ASC';
+					echo "<select class='form-control' name='employee_id' id='employee_id'>";
 					foreach ($pdo->query($sql) as $row) {
-						if($row['id']==$person)
-							echo "<option selected value='" . $row['id'] . " '> " . $row['lname'] . ', ' .$row['fname'] . "</option>";
-						else
-							echo "<option value='" . $row['id'] . " '> " . $row['lname'] . ', ' .$row['fname'] . "</option>";
+						if (0 == strcmp($row['title'], 'Employee')) {
+							if($row['id']==$employee)
+								echo "<option selected value='" . $row['id'] . " '> " . $row['lname'] . ', ' .$row['fname'] . "</option>";
+							else
+								echo "<option value='" . $row['id'] . " '> " . $row['lname'] . ', ' .$row['fname'] . "</option>";
 					}
+				}
 					echo "</select>";
 					Database::disconnect();
 				?>
@@ -101,7 +103,7 @@ writeBodyOpen();?>
 
 		<div class="form-actions">
 			<button type="submit" class="btn btn-success">Update</button>
-				<a class="btn btn-warning" href="fr_assignments.php">Back</a>
+				<a class="btn btn-warning" href="assignments_list.php">Back</a>
 		</div>	
 	</form>			
 </div> <!-- end div: class="span10 offset1" -->

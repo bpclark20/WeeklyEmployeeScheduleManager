@@ -68,7 +68,7 @@ writeBodyOpen();
 					    <h3>Date</h3>
 					    <div class="controls">
 					      	<label class="checkbox">
-						     	<?php echo $data['eventDate'];?>
+						     	<?php echo dayMonthDate($data['eventDate']);?>
 						    </label>
 					    </div>
 					  </div>
@@ -76,7 +76,7 @@ writeBodyOpen();
 					    <h3>Time</h3>
 					    <div class="controls">
 					      	<label class="checkbox">
-						     	<?php echo $data['eventTime'];?>
+						     	<?php echo timeAmPm($data['eventTime']);?>
 						    </label>
 					    </div>
 					  </div>
