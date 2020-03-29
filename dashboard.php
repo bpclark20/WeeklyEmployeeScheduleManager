@@ -73,7 +73,6 @@ writeBodyOpen();
 								}
 						  		if(0==strcmp($employeeTitle,"Employee")) {
 									echo "<a class='btn btn-primary' href='assignments_list.php?id=" . $LoggedInID . "'>My Scheduled Shifts</a>&nbsp;";
-									echo "<a class='btn btn-primary' href='availability_update.php'>My Availability</a>&nbsp;";
 						  	} ?>
 					   </div>
 					
