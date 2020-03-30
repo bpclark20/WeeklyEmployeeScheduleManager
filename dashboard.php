@@ -57,7 +57,7 @@ writeBodyOpen();
 					    </div>
 					  </div>
 					    <div class="form-actions">
-							<a class="btn btn-success" href="https://github.com/diablodelnoche/cis355">View Github Code</a>
+							<a class="btn btn-success" href="https://github.com/bpclark20/WeeklyEmployeeScheduleManager">View Github Code</a>
 							<a class="btn btn-danger" href="logout.php">Logout</a>&nbsp;
               <a class="btn btn-primary" href="employees_update.php?id=<?php echo $LoggedInID . '"'; ?>>Update My Info</a>&nbsp;
 							<?php 
