@@ -9,12 +9,14 @@ if ( !empty($_POST)) {
 	$timeError = null;
 	$locationError = null;
 	$descriptionError = null;
+	$uniformError = null;
 	
 	// keep track post values
 	$date = $_POST['date'];
 	$time = $_POST['time'];
 	$location = $_POST['location'];
 	$description = $_POST['description'];
+	$uniform = $_POST['uniform'];
 
 	
 	// validate input
@@ -36,20 +38,24 @@ if ( !empty($_POST)) {
 		$descriptionError = "Please enter an event description.";
 		$valid = false;
 	}
+	if (empty($description)) {
+		$descriptionError = "Please enter an event description.";
+		$valid = false;
+	}
 
 	// insert data
 	if ($valid) {
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "INSERT INTO events (eventDate,eventTime,location, description) values(?, ?, ?, ?)";
+		$sql = "INSERT INTO events (eventDate,eventTime,location,description,uniform) values(?, ?, ?, ?)";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($date, $time, $location, $description));
+		$q->execute(array($date, $time, $location, $description, $uniform));
 		Database::disconnect();
-		header("Location: crud_events.php");
+		header("Location: events_list.php");
 	}
 }	
 
-writeHeader("CRUD - Events - Add a new event");
+writeHeader("Add a new event");
 writeBodyOpen();
 ?>
 
@@ -58,7 +64,7 @@ writeBodyOpen();
 		    			<h3>Add a new Event</h3>
 		    		</div>
     		
-	    			<form class="form-horizontal" action="crud_events_create.php" method="post">
+	    			<form class="form-horizontal" action="events_create.php" method="post">
 					  <div class="control-group <?php echo !empty($dateError)?'error':'';?>">
 					    <label class="control-label">Date</label>
 					    <div class="controls">
@@ -95,9 +101,18 @@ writeBodyOpen();
 					      	<?php endif;?>
 					    </div>
 					  </div>
+						<div class="control-group <?php echo !empty($uniformError)?'error':'';?>">
+					    <label class="control-label">Uniform</label>
+					    <div class="controls">
+					      	<input name="uniform" type="text"  placeholder="Event Uniform" value="<?php echo !empty($uniform)?$uniform:'';?>">
+					      	<?php if (!empty($uniformError)): ?>
+					      		<span class="help-inline"><?php echo $uniformError;?></span>
+					      	<?php endif;?>
+					    </div>
+					  </div>
 					  <div class="form-actions">
 						  <button type="submit" class="btn btn-success">Add</button>
-						  <a class="btn btn-primary" href="crud_events.php">Back</a>
+						  <a class="btn btn-primary" href="events_list.php">Back</a>
 						</div>
 					</form>
 				</div>

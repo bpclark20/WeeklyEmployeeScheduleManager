@@ -44,7 +44,7 @@ writeBodyOpen();
 
 <div class="span10 offset1">
     				<div class="row">
-		    			<h3>Add a new Event</h3>
+		    			<h3>Schedule a Shift</h3>
 		    		</div>
     		
 	    			<form class="form-horizontal" action="assignments_create.php" method="post">
