@@ -83,12 +83,9 @@ writeBodyOpen();
       echo '<td width=250>';
    	  echo '<a class="btn btn-primary" href="employees_read.php?id='.$row['id'].'">Read</a>';
       echo '&nbsp;';
-      if ((0==strcmp($LoggedInTitle,'Manager') and 0==strcmp($LoggedInID,$row['id'])) or (0==strcmp($LoggedInTitle,'Admin'))){
-        echo '<a class="btn btn-success" href="employees_update.php?id='.$row['id'].'">Update</a>';
-      }
-   	  
+      echo '<a class="btn btn-success" href="employees_update.php?id='.$row['id'].'">Update</a>';
       echo '&nbsp;';
-      if (0==strcmp($LoggedInTitle,'Admin') and 0!=strcmp($LoggedInID,$row['id'])) {
+      if (0!=strcmp($LoggedInID,$row['id'])) {
         echo '<a class="btn btn-danger" href="employees_delete.php?id='.$row['id'].'">Delete</a>';
       }
    	  echo '</td>';

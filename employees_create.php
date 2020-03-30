@@ -173,15 +173,16 @@ writeBodyOpen();
 					      	<?php endif;?>
 					    </div>
 					  </div>
-					  <div class="control-group <?php echo !empty($titleError)?'error':'';?>">
-					    <label class="control-label">Title</label>
-					    <div class="controls">
-					      	<input name="title" type="text"  placeholder="Title">
-					      	<?php if (!empty($titleError)): ?>
-					      		<span class="help-inline"><?php echo $titleError;?></span>
-					      	<?php endif;?>
-					    </div>
-					  </div>
+					  <div class="control-group">
+					<label class="control-label">Title</label>
+					<div class="controls">
+						<select class="form-control" name="title">
+							<option value="Employee" selected>Employee</option>
+							<option value="Manager">Manager</option>
+							<option value="Admin">Admin</option>
+						</select>
+					</div>
+				</div>
 					  <div class="control-group <?php echo !empty($pictureError)?'error':'';?>">
 					    <label class="control-label">Photo</label>
 					    <div class="controls">
