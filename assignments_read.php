@@ -3,6 +3,12 @@
 #include helper php file
 require 'pageWriter.php';
 
+checkLoggedIn();
+
+# get details for currently logged in user
+$LoggedInEmployeeID = $_SESSION['employee_id'];
+$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInEmployeeID);
+
 $id = $_GET['id'];
 
 $pdo = Database::connect();
@@ -14,7 +20,7 @@ $q = $pdo->prepare($sql);
 $q->execute(array($id));
 $data = $q->fetch(PDO::FETCH_ASSOC);
 
-# get employee details
+# get event employee details
 $sql = "SELECT * FROM employees where id = ?";
 $q = $pdo->prepare($sql);
 $q->execute(array($data['assign_per_id']));
@@ -25,6 +31,8 @@ $sql = "SELECT * FROM events where id = ?";
 $q = $pdo->prepare($sql);
 $q->execute(array($data['assign_event_id']));
 $eventdata = $q->fetch(PDO::FETCH_ASSOC);
+
+
 
 Database::disconnect();
 
@@ -76,8 +84,8 @@ writeBodyOpen();?>
 				
 		<div class="form-actions">
 		<?php
-		if(0==strcmp($empdata['title'],'Employee')) {
-			echo '<a class="btn btn-primary" href="assignments_list.php?id=' . $empdata['id']. '">Back</a>';
+		if(0==strcmp($LoggedInEmployeeTitle,'Employee')) {
+			echo '<a class="btn btn-primary" href="assignments_list.php?id=' . $LoggedInEmployeeID . '">Back</a>';
 		}
 		else {
 			echo '<a class="btn btn-primary" href="assignments_list.php">Back</a>';

@@ -3,20 +3,15 @@
 #include helper php file
 require 'pageWriter.php';
 
-if(!isset($_SESSION['employee_id'])){
-	session_destroy();
-	header('Location: login.php');
-	exit; // exit is here just in case the header redirect fails for some reason
-}
-else {
-	$LoggedInEmployeeID = $_SESSION['employee_id'];
+checkLoggedIn();
 
-	$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInEmployeeID);
-	# if the user currently logged in is not a Manager
-	# or an administrator, then redirect them back to the dashboard
-	if (0==strcmp($LoggedInEmployeeTitle,'Employee')) {
-		header('Location: dashboard.php');
-	}
+$LoggedInEmployeeID = $_SESSION['employee_id'];
+
+$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInEmployeeID);
+# if the user currently logged in is not a Manager
+# or an administrator, then redirect them back to the dashboard
+if (0==strcmp($LoggedInEmployeeTitle,'Employee')) {
+	header('Location: dashboard.php');
 }
 
 if ( !empty($_POST)) {

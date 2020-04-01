@@ -6,43 +6,38 @@ require 'pageWriter.php';
 # If employee_id is not set, the user
 # is not logged in, so redirect them
 # to the login page.
-if(!isset($_SESSION['employee_id'])){
-  session_destroy();
-  header('Location: login.php');
-  exit; // exit is here just in case the header redirect fails for some reason
-}
-else {
-  $LoggedInID = $_SESSION['employee_id'];
+checkLoggedIn();
+
+$LoggedInID = $_SESSION['employee_id'];
 
 
-   # Grab the extra details needed about the currently logged in
-   # employee
-	$pdo = Database::connect();
-	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$sql = "SELECT * FROM employees WHERE id = ?";
-	$q = $pdo->prepare($sql);
-	$q->execute(array($LoggedInID));
-    $data = $q->fetch(PDO::FETCH_ASSOC);
-
-  $employeeFirstName = $data['fname'];
-  $employeeLastName = $data['lname'];
-  $employeeEmail = $data['email'];
-  $LoggedInTitle = $data['title'];
-  Database::disconnect();
-
-  if(0==strcmp($LoggedInTitle,'Employee')) {
-    header('Location: dashboard.php');
-  }
-
-  # Grab all of the employees
-  $pdo = Database::connect();
-	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$sql = "SELECT * FROM employees";
-	$q = $pdo->prepare($sql);
-	$q->execute(array($LoggedInID));
+# Grab the extra details needed about the currently logged in
+# employee
+$pdo = Database::connect();
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$sql = "SELECT * FROM employees WHERE id = ?";
+$q = $pdo->prepare($sql);
+$q->execute(array($LoggedInID));
   $data = $q->fetch(PDO::FETCH_ASSOC);
-  Database::disconnect();
+
+$employeeFirstName = $data['fname'];
+$employeeLastName = $data['lname'];
+$employeeEmail = $data['email'];
+$LoggedInTitle = $data['title'];
+Database::disconnect();
+
+if(0==strcmp($LoggedInTitle,'Employee')) {
+  header('Location: dashboard.php');
 }
+
+# Grab all of the employees
+$pdo = Database::connect();
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$sql = "SELECT * FROM employees";
+$q = $pdo->prepare($sql);
+$q->execute(array($LoggedInID));
+$data = $q->fetch(PDO::FETCH_ASSOC);
+Database::disconnect();
 
 writeHeader("View All Employees");
 writeBodyOpen();

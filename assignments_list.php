@@ -3,54 +3,47 @@
 #include helper php file
 require 'pageWriter.php';
 
-# If employee_id is not set, the user
-# is not logged in, so redirect them
-# to the login page.
-if(!isset($_SESSION['employee_id'])){
-  session_destroy();
-  header('Location: login.php');
-  exit; // exit is here just in case the header redirect fails for some reason
+
+checkLoggedIn();
+
+$LoggedInID = $_SESSION['employee_id'];
+
+if (isset($_GET['id'])) {
+  $id = $_GET['id'];
 }
 else {
-  $LoggedInID = $_SESSION['employee_id'];
-
-  if (isset($_GET['id'])) {
-    $id = $_GET['id'];
-  }
-  else {
-    $id = null;
-  }
-
-
-
-   # Grab the extra details needed about the currently logged in
-   # employee
-	$pdo = Database::connect();
-	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$sql = "SELECT * FROM employees WHERE id = ?";
-	$q = $pdo->prepare($sql);
-	$q->execute(array($LoggedInID));
-    $data = $q->fetch(PDO::FETCH_ASSOC);
-
-  $employeeFirstName = $data['fname'];
-  $employeeLastName = $data['lname'];
-  $employeeEmail = $data['email'];
-  $LoggedInTitle = $data['title'];
-  Database::disconnect();
-
-  if ($id == null and (0==strcmp($LoggedInTitle,'Employee'))) {
-    header('Location: dashboard.php');
-  }
-
-  # Grab all of the events
-  $pdo = Database::connect();
-	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$sql = "SELECT * FROM assignments";
-	$q = $pdo->prepare($sql);
-	$q->execute();
-  $data = $q->fetch(PDO::FETCH_ASSOC);
-  Database::disconnect();
+  $id = null;
 }
+
+
+
+# Grab the extra details needed about the currently logged in
+# employee
+$pdo = Database::connect();
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$sql = "SELECT * FROM employees WHERE id = ?";
+$q = $pdo->prepare($sql);
+$q->execute(array($LoggedInID));
+  $data = $q->fetch(PDO::FETCH_ASSOC);
+
+$employeeFirstName = $data['fname'];
+$employeeLastName = $data['lname'];
+$employeeEmail = $data['email'];
+$LoggedInTitle = $data['title'];
+Database::disconnect();
+
+if ($id == null and (0==strcmp($LoggedInTitle,'Employee'))) {
+  header('Location: dashboard.php');
+}
+
+# Grab all of the events
+$pdo = Database::connect();
+$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+$sql = "SELECT * FROM assignments";
+$q = $pdo->prepare($sql);
+$q->execute();
+$data = $q->fetch(PDO::FETCH_ASSOC);
+Database::disconnect();
 
 writeHeader("View All Assigned Shifts");
 writeBodyOpen();

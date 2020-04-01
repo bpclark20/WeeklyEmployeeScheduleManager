@@ -3,6 +3,8 @@
 #include helper php file
 require 'pageWriter.php';
 
+checkLoggedIn();
+
 $id = $_GET['id'];
 
 if ( !empty($_POST)) { // if $_POST filled then process the form

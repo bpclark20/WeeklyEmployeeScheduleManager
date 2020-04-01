@@ -3,6 +3,8 @@
 #include helper php file
 require 'pageWriter.php';
 
+checkLoggedIn();
+
 if ( !empty($_POST)) {
 	// keep track validation errors
 	$employeeError = null;

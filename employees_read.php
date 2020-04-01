@@ -3,40 +3,33 @@
 #include helper php file
 require 'pageWriter.php';
 
-if(!isset($_SESSION['employee_id'])){
-	session_destroy();
-	header('Location: login.php');
-	exit; // exit is here just in case the header redirect fails for some reason
-}
-else {
-	$LoggedInEmployeeID = $_SESSION['employee_id'];
+checkLoggedIn();
 
-	$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInEmployeeID);
-	# if the user currently logged in is not a Manager
-	# or an administrator, then redirect them back to the dashboard
-	if (0==strcmp($LoggedInEmployeeTitle,'Employee')) {
-		header('Location: dashboard.php');
-	}
+$LoggedInEmployeeID = $_SESSION['employee_id'];
 
-	$id = null;
-	if ( !empty($_GET['id'])) {
-		$id = $_REQUEST['id'];
-	}
-	
-	if ( null==$id ) {
-		header("Location: employees_list.php");
-	} else {
-		$pdo = Database::connect();
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT * FROM employees where id = ?";
-		$q = $pdo->prepare($sql);
-		$q->execute(array($id));
-		$data = $q->fetch(PDO::FETCH_ASSOC);
-		Database::disconnect();
-	}
+$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInEmployeeID);
+# if the user currently logged in is not a Manager
+# or an administrator, then redirect them back to the dashboard
+if (0==strcmp($LoggedInEmployeeTitle,'Employee')) {
+	header('Location: dashboard.php');
 }
 
+$id = null;
+if ( !empty($_GET['id'])) {
+	$id = $_REQUEST['id'];
+}
 
+if ( null==$id ) {
+	header("Location: employees_list.php");
+} else {
+	$pdo = Database::connect();
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$sql = "SELECT * FROM employees where id = ?";
+	$q = $pdo->prepare($sql);
+	$q->execute(array($id));
+	$data = $q->fetch(PDO::FETCH_ASSOC);
+	Database::disconnect();
+}
 
 writeHeader("View Employee Details");
 writeBodyOpen();

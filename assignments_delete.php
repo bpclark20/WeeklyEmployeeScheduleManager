@@ -3,6 +3,8 @@
 #include helper php file
 require 'pageWriter.php';
 
+checkLoggedIn();
+
 $id = 0;
 	
 if ( !empty($_GET['id'])) {

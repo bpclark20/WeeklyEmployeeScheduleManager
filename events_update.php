@@ -5,95 +5,92 @@ require 'pageWriter.php';
 
 $id = null;
 
-if(!isset($_SESSION['employee_id'])){
-    session_destroy();
-    header('Location: login.php');
-    exit; // exit is here just in case the header redirect fails for some reason
+checkLoggedIn();
+
+if ( !empty($_GET['id'])) {
+	$id = $_REQUEST['id'];
 }
-else{
-	if ( !empty($_GET['id'])) {
-		$id = $_REQUEST['id'];
-	}
 
-	if (null==$id) {
-		header('Location: dashboard.php');
-	}
-
-	$LoggedInID = $_SESSION['employee_id'];
-	
-	if ( !empty($_POST)) {
-		// keep track validation errors
-		$descriptionError = null;
-		$locationError = null;
-		$dateError = null;
-		$timeError = null;
-		$uniformError = null;
-		
-		# Initialize POST Variables
-		$description = $_POST['description'];
-		$location = $_POST['location'];
-		$eventDate = $_POST['eventDate'];
-		$eventTime = $_POST['eventTime'];
-		$uniform = $_POST['uniform']; 
-		
-		# Validate User Input
-		$valid = true;
-		if (empty($description)) {
-			$descriptionError = 'Please enter an event Name.';
-			$valid = false;
-		}
-
-		if (empty($location)) {
-			$locationError = 'Please enter an event location.';
-			$valid = false;
-		}
-		
-		if (empty($eventDate)) {
-			$dateError = 'Please enter an event date.';
-			$valid = false;
-		} 
-
-		if (empty($eventTime)) {
-			$timeError = 'Please enter an event time.';
-			$valid = false;
-		}
-
-		if (empty($uniform)) {
-			$uniformError = 'Please enter a uniform description.';
-			$valid = false;
-		}
-		
-		// update data
-		if ($valid) {
-				$pdo = Database::connect();
-				$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-				$sql = "UPDATE events set description = ?, location = ?, eventDate = ?, eventTime = ?, uniform = ? WHERE id = ?";
-				$q = $pdo->prepare($sql);
-				$q->execute(array($description, $location, $eventDate, $eventTime, $uniform, $id));
-				Database::disconnect();
-				header("Location: events_list.php");
-		}
-	} else {
-		# Grab the info for the event we are currently trying to update
-		$pdo = Database::connect();
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "SELECT * FROM events where id = ? LIMIT 1";
-		$q = $pdo->prepare($sql);
-		$q->execute(array($id));
-		$data = $q->fetch(PDO::FETCH_ASSOC);
-		$id = $data['id'];
-		$description = $data['description'];
-		$location = $data['location'];
-		$eventDate = $data['eventDate'];
-		$eventTime = $data['eventTime'];
-		$uniform = $data['uniform'];
-		Database::disconnect();
-
-		# Grab the credentials of the user who is currently trying to 
-		# make the update
-		$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInID);
-	}
+if (null==$id) {
+	header('Location: dashboard.php');
 }
+
+$LoggedInID = $_SESSION['employee_id'];
+
+if ( !empty($_POST)) {
+	// keep track validation errors
+	$descriptionError = null;
+	$locationError = null;
+	$dateError = null;
+	$timeError = null;
+	$uniformError = null;
+
+	# Initialize POST Variables
+	$description = $_POST['description'];
+	$location = $_POST['location'];
+	$eventDate = $_POST['eventDate'];
+	$eventTime = $_POST['eventTime'];
+	$uniform = $_POST['uniform']; 
+
+	# Validate User Input
+	$valid = true;
+	if (empty($description)) {
+		$descriptionError = 'Please enter an event Name.';
+		$valid = false;
+	}
+
+	if (empty($location)) {
+		$locationError = 'Please enter an event location.';
+		$valid = false;
+	}
+
+	if (empty($eventDate)) {
+		$dateError = 'Please enter an event date.';
+		$valid = false;
+	} 
+
+	if (empty($eventTime)) {
+		$timeError = 'Please enter an event time.';
+		$valid = false;
+	}
+
+	if (empty($uniform)) {
+		$uniformError = 'Please enter a uniform description.';
+		$valid = false;
+	}
+
+	// update data
+	if ($valid) {
+			$pdo = Database::connect();
+			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+			$sql = "UPDATE events set description = ?, location = ?, eventDate = ?, eventTime = ?, uniform = ? WHERE id = ?";
+			$q = $pdo->prepare($sql);
+			$q->execute(array($description, $location, $eventDate, $eventTime, $uniform, $id));
+			Database::disconnect();
+			header("Location: events_list.php");
+	}
+} 
+else {
+	# Grab the info for the event we are currently trying to update
+	$pdo = Database::connect();
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+	$sql = "SELECT * FROM events where id = ? LIMIT 1";
+	$q = $pdo->prepare($sql);
+	$q->execute(array($id));
+	$data = $q->fetch(PDO::FETCH_ASSOC);
+	$id = $data['id'];
+	$description = $data['description'];
+	$location = $data['location'];
+	$eventDate = $data['eventDate'];
+	$eventTime = $data['eventTime'];
+	$uniform = $data['uniform'];
+	Database::disconnect();
+
+	# Grab the credentials of the user who is currently trying to 
+	# make the update
+	$LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInID);
+}
+
 writeHeader("Update Event Info");
 writeBodyOpen();
 ?>
