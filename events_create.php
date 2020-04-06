@@ -49,7 +49,7 @@ if ( !empty($_POST)) {
 	if ($valid) {
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "INSERT INTO events (eventDate,eventTime,location,description,uniform) values(?, ?, ?, ?)";
+		$sql = "INSERT INTO events (eventDate,eventTime,location,description,uniform) values(?, ?, ?, ?, ?)";
 		$q = $pdo->prepare($sql);
 		$q->execute(array($date, $time, $location, $description, $uniform));
 		Database::disconnect();
