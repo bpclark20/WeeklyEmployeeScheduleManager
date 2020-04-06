@@ -9,10 +9,10 @@ checkLoggedIn();
 $LoggedInID = $_SESSION['employee_id'];
 
 if (isset($_GET['id'])) {
-  $id = $_GET['id'];
+  $employee_id = $_GET['id'];
 }
 else {
-  $id = null;
+  $employee_id = null;
 }
 
 
@@ -32,7 +32,7 @@ $employeeEmail = $data['email'];
 $LoggedInTitle = $data['title'];
 Database::disconnect();
 
-if ($id == null and (0==strcmp($LoggedInTitle,'Employee'))) {
+if ($employee_id == null and (0==strcmp($LoggedInTitle,'Employee'))) {
   header('Location: dashboard.php');
 }
 
@@ -77,11 +77,11 @@ writeBodyOpen();
   <?php 
     $pdo = Database::connect();
 
-    if($id != null) {
+    if($employee_id != null) {
 			$sql = "SELECT * FROM assignments 
 			LEFT JOIN employees ON employees.id = assignments.assign_per_id 
 			LEFT JOIN events ON events.id = assignments.assign_event_id
-			WHERE employees.id = $id 
+			WHERE employees.id = $employee_id 
       ORDER BY eventDate ASC, eventTime ASC, lname ASC, fname ASC";
     }
     else { 
@@ -94,6 +94,8 @@ writeBodyOpen();
 
 
     foreach($pdo->query($sql) as $row) {
+      //print_r($row);
+      echo '<br>';
       echo "<tr>";
       echo "<td>". $row['description'] . "</td>";
       echo '<td>' . $row['location'] . '</td>';
@@ -101,12 +103,12 @@ writeBodyOpen();
       echo '<td>' . timeAmPm($row['eventTime']) . '</td>';
       echo '<td>' . $row['fname'] . " " . $row['lname'] . '</td>';
       echo '<td width=250>';
-   	  echo '<a class="btn btn-primary" href="assignments_read.php?id='.$row['id'].'">Read</a>';
+   	  echo '<a class="btn btn-primary" href="assignments_read.php?id='.$row['assign_id'].'">Read</a>';
       echo '&nbsp;';
       if(0!=strcmp($LoggedInTitle,'Employee')) {
-        echo '<a class="btn btn-success" href="assignments_update.php?id='.$row['id'].'">Update</a>';
+        echo '<a class="btn btn-success" href="assignments_update.php?id='.$row['assign_id'].'">Update</a>';
         echo '&nbsp;';
-        echo '<a class="btn btn-danger" href="assignments_delete.php?id='.$row['id'].'">Delete</a>';
+        echo '<a class="btn btn-danger" href="assignments_delete.php?id='.$row['assign_id'].'">Delete</a>';
         echo '</td>';
       }
    	  echo '</tr>';

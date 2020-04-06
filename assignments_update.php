@@ -5,7 +5,7 @@ require 'pageWriter.php';
 
 checkLoggedIn();
 
-$id = $_GET['id'];
+$assign_id = $_GET['id'];
 
 if ( !empty($_POST)) { // if $_POST filled then process the form
 	
@@ -33,9 +33,9 @@ if ( !empty($_POST)) { // if $_POST filled then process the form
 	if ($valid) {
 		$pdo = Database::connect();
 		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-		$sql = "UPDATE assignments set assign_per_id = ?, assign_event_id = ? WHERE id = ?";
+		$sql = "UPDATE assignments set assign_per_id = ?, assign_event_id = ? WHERE assign_id = ?";
 		$q = $pdo->prepare($sql);
-		$q->execute(array($employee,$event,$id));
+		$q->execute(array($employee,$event,$assign_id));
 		Database::disconnect();
 		header("Location: assignments_list.php");
 	}
@@ -43,9 +43,9 @@ if ( !empty($_POST)) { // if $_POST filled then process the form
 else { // if $_POST NOT filled then pre-populate the form
 	$pdo = Database::connect();
 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$sql = "SELECT * FROM assignments where id = ?";
+	$sql = "SELECT * FROM assignments where assign_id = ?";
 	$q = $pdo->prepare($sql);
-	$q->execute(array($id));
+	$q->execute(array($assign_id));
 	$data = $q->fetch(PDO::FETCH_ASSOC);
 	$employee = $data['assign_per_id'];
 	$event = $data['assign_event_id'];
@@ -60,7 +60,7 @@ writeBodyOpen();?>
 		<h2>Update an Assignment</h2>
 	</div>
 	
-	<form class="form-horizontal" action="assignments_update.php?id=<?php echo $id?>" method="post">	
+	<form class="form-horizontal" action="assignments_update.php?id=<?php echo $assign_id?>" method="post">	
 		<div class="control-group">
 			<label class="control-label">Employee</label>
 			<div class="controls">

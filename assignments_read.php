@@ -9,15 +9,15 @@ checkLoggedIn();
 $LoggedInEmployeeID = $_SESSION['employee_id'];
 $LoggedInEmployeeTitle = getLoggedInUserTitle($LoggedInEmployeeID);
 
-$id = $_GET['id'];
+$assign_id = $_GET['id'];
 
 $pdo = Database::connect();
 $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 # get assignment details
-$sql = "SELECT * FROM assignments where id = ?";
+$sql = "SELECT * FROM assignments where assign_id = ?";
 $q = $pdo->prepare($sql);
-$q->execute(array($id));
+$q->execute(array($assign_id));
 $data = $q->fetch(PDO::FETCH_ASSOC);
 
 # get event employee details

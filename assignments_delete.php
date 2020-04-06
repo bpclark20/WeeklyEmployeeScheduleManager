@@ -5,22 +5,22 @@ require 'pageWriter.php';
 
 checkLoggedIn();
 
-$id = 0;
+$assign_id = 0;
 	
 if ( !empty($_GET['id'])) {
-	$id = $_REQUEST['id'];
+	$assign_id = $_REQUEST['id'];
 }
 
 if ( !empty($_POST)) { // if user clicks "yes" (sure to delete), delete record
 
-	$id = $_POST['id'];
+	$assign_id = $_POST['assign_id'];
 	
 	// delete data
 	$pdo = Database::connect();
 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-	$sql = "DELETE FROM assignments  WHERE id = ?";
+	$sql = "DELETE FROM assignments  WHERE assign_id = ?";
 	$q = $pdo->prepare($sql);
-	$q->execute(array($id));
+	$q->execute(array($assign_id));
 	Database::disconnect();
 	header("Location: assignments_list.php");
 }
@@ -30,9 +30,9 @@ else { // otherwise, pre-populate fields to show data to be deleted
 	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 	
 	# get assignment details
-	$sql = "SELECT * FROM assignments where id = ?";
+	$sql = "SELECT * FROM assignments where assign_id = ?";
 	$q = $pdo->prepare($sql);
-	$q->execute(array($id));
+	$q->execute(array($assign_id));
 	$data = $q->fetch(PDO::FETCH_ASSOC);
 	
 	# get employee details
@@ -93,7 +93,7 @@ writeBodyOpen();?>
 			</div> <!-- end div: class="form-horizontal" -->
 
 			<form class="form-horizontal" action="assignments_delete.php" method="post">
-				<input type="hidden" name="id" value="<?php echo $id;?>"/>
+				<input type="hidden" name="assign_id" value="<?php echo $assign_id;?>"/>
 				<p class="alert alert-error">Are you sure you want to remove this employee from the event?</p>
 				<div class="form-actions">
 					<button type="submit" class="btn btn-danger">Yes</button>
